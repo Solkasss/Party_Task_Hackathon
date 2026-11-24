@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  events        Event[]        @relation("AuthorEvents")
+  attendances   Registration[]
+  comments      Comment[]
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  startsAt    DateTime
+  capacity    Int
+  coverUrl    String
+  isPrivate   Boolean  @default(false)
+  inviteToken String?  @unique
+  authorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author      User           @relation("AuthorEvents", fields: [authorId], references: [id], onDelete: Cascade)
+  attendances Registration[]
+  comments    Comment[]
+
+  @@index([isPrivate, startsAt])
+}
+
+model Registration {
+  id        String   @id @default(uuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
