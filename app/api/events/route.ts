@@ -9,10 +9,7 @@ export async function GET(request: NextRequest) {
   const q = searchParams.get("q")?.trim().toLowerCase() ?? "";
 
   const rawEvents = await prisma.event.findMany({
-    where: {
-      isPrivate: false,
-      startsAt: { gt: new Date() },
-    },
+    where: { isPrivate: false, startsAt: { gt: new Date() } },
     orderBy: { startsAt: "asc" },
     select: {
       id: true,
@@ -36,12 +33,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json(
-      { error: "Необхідна авторизація" },
-      { status: 401 }
-    );
-  }
+  if (!user) return NextResponse.json({ error: "Необхідна авторизація" }, { status: 401 });
 
   let body: unknown;
   try {
@@ -52,15 +44,10 @@ export async function POST(request: NextRequest) {
 
   const result = createEventSchema.safeParse(body);
   if (!result.success) {
-    return NextResponse.json(
-      { error: result.error.errors[0].message },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
   }
 
-  const { title, description, startsAt, capacity, coverUrl, isPrivate } =
-    result.data;
-
+  const { title, description, startsAt, capacity, coverUrl, isPrivate } = result.data;
   const inviteToken = isPrivate ? crypto.randomUUID() : null;
 
   const event = await prisma.event.create({

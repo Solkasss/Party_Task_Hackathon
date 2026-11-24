@@ -31,7 +31,9 @@ function formatDate(dateStr: string) {
 function CopyButton({ token, eventId }: { token: string; eventId: string }) {
   const [copied, setCopied] = useState(false);
 
-  function handleCopy() {
+  function handleCopy(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     const url = `${window.location.origin}/events/${eventId}?invite=${token}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
