@@ -139,7 +139,8 @@ function EventPageContent() {
     setRegError("");
     setRegLoading(true);
     try {
-      const res = await fetch(`/api/events/${id}/register`, {
+      const qs = invite ? `?invite=${encodeURIComponent(invite)}` : "";
+      const res = await fetch(`/api/events/${id}/register${qs}`, {
         method: "DELETE",
       });
       const data = await res.json();

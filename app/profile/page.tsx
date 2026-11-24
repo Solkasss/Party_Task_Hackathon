@@ -60,7 +60,7 @@ function EventCard({
 
   return (
     <Link
-      href={`/events/${event.id}`}
+      href={event.isPrivate && event.inviteToken ? `/events/${event.id}?invite=${event.inviteToken}` : `/events/${event.id}`}
       className="group flex gap-4 bg-white border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow"
     >
       {/* Thumbnail */}

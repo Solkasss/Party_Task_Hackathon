@@ -6,13 +6,12 @@ import crypto from "crypto";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const q = searchParams.get("q")?.trim() ?? "";
+  const q = searchParams.get("q")?.trim().toLowerCase() ?? "";
 
-  const events = await prisma.event.findMany({
+  const rawEvents = await prisma.event.findMany({
     where: {
       isPrivate: false,
       startsAt: { gt: new Date() },
-      ...(q ? { title: { contains: q } } : {}),
     },
     orderBy: { startsAt: "asc" },
     select: {
@@ -27,6 +26,10 @@ export async function GET(request: NextRequest) {
       _count: { select: { attendances: true } },
     },
   });
+
+  const events = q
+    ? rawEvents.filter((e) => e.title.toLowerCase().includes(q))
+    : rawEvents;
 
   return NextResponse.json({ events }, { status: 200 });
 }

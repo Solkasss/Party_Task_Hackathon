@@ -62,7 +62,8 @@ export default function NewEventPage() {
         setError(data.error ?? "Помилка при створенні події");
         return;
       }
-      router.push(`/events/${data.event.id}`);
+      router.push(data.event?.isPrivate && data.event?.inviteToken ? `/events/${data.event.id}?invite=${data.event.inviteToken}` : `/events/${data.event.id}`);
+      router.refresh();
     } catch {
       setError("Помилка з'єднання. Спробуйте ще раз.");
     } finally {

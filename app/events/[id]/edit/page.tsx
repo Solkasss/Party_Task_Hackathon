@@ -107,7 +107,8 @@ export default function EditEventPage() {
         setError(data.error ?? "Помилка збереження");
         return;
       }
-      router.push(`/events/${id}`);
+      router.push(data.event?.isPrivate && data.event?.inviteToken ? `/events/${id}?invite=${data.event.inviteToken}` : `/events/${id}`);
+      router.refresh();
     } catch {
       setError("Помилка з'єднання");
     } finally {
